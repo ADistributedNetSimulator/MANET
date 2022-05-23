@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- 引入 echarts.js -->
+    <script src="https://cdn.staticfile.org/echarts/4.3.0/echarts.min.js"></script>
+    <script src="js/echarts-gl.min.js"></script>
+
+    <title>test</title>
+</head>
+<body>
+    <div id="main-3d" style="width: 600px;height:500px;"></div>
+
+    <script type="text/javascript">
+        // $(document).ready(function () {
+        //     console.log("-------------");
+        //     var data = [{
+        //         "id": 0,
+        //         "x": 10.0,
+        //         "y": 2.0,
+        //         "z": 3.0,
+        //         "range": 0,
+        //         "flag": 2,
+        //         "pilot": "张三",
+        //         "ammunition": 10,
+        //         "totalAmmunition": 10,
+        //         "oil": 99,
+        //         "totalOil": 100
+        //     }, {
+        //         "id": 1,
+        //         "x": 4.0,
+        //         "y": 3.0,
+        //         "z": 4.0,
+        //         "range": 0,
+        //         "flag": 2,
+        //         "pilot": "李四",
+        //         "ammunition": 9,
+        //         "totalAmmunition": 10,
+        //         "oil": 97,
+        //         "totalOil": 100
+        //     }, {
+        //         "id": 2,
+        //         "x": 5.0,
+        //         "y": 6.0,
+        //         "z": 6.0,
+        //         "range": 0,
+        //         "flag": 2,
+        //         "pilot": "王五",
+        //         "ammunition": 8,
+        //         "totalAmmunition": 10,
+        //         "oil": 95,
+        //         "totalOil": 100
+        //     }, {
+        //         "id": 3,
+        //         "x": 4.0,
+        //         "y": 5.0,
+        //         "z": 6.0,
+        //         "range": 0,
+        //         "flag": 1,
+        //         "pilot": "赵六",
+        //         "ammunition": 7,
+        //         "totalAmmunition": 10,
+        //         "oil": 93,
+        //         "totalOil": 100
+        //     }];
+        //     var data1 = [];
+        //     for (var i = 0; i < data.length; i++) {
+        //         var x = data[i].x;
+        //         var y = data[i].y;
+        //         var z = data[i].z;
+        //         data1.push([x, y, z]);
+        //     }
+        //
+        //     var data10 = [{
+        //         "id": 0,
+        //         "x": 20.0,
+        //         "y": 21.0,
+        //         "z": 22.0,
+        //         "range": 0,
+        //         "flag": 3,
+        //         "pilot": "张三",
+        //         "ammunition": 10,
+        //         "totalAmmunition": 10,
+        //         "oil": 99,
+        //         "totalOil": 100
+        //     }, {
+        //         "id": 1,
+        //         "x": 24.0,
+        //         "y": 23.0,
+        //         "z": 22.0,
+        //         "range": 0,
+        //         "flag": 3,
+        //         "pilot": "李四",
+        //         "ammunition": 9,
+        //         "totalAmmunition": 10,
+        //         "oil": 97,
+        //         "totalOil": 100
+        //     }, {
+        //         "id": 2,
+        //         "x": 30.0,
+        //         "y": 33.0,
+        //         "z": 35.0,
+        //         "range": 0,
+        //         "flag": 3,
+        //         "pilot": "王五",
+        //         "ammunition": 8,
+        //         "totalAmmunition": 10,
+        //         "oil": 95,
+        //         "totalOil": 100
+        //     }, {
+        //         "id": 3,
+        //         "x": 26.0,
+        //         "y": 30.0,
+        //         "z": 34.0,
+        //         "range": 0,
+        //         "flag": 2,
+        //         "pilot": "赵六",
+        //         "ammunition": 7,
+        //         "totalAmmunition": 10,
+        //         "oil": 93,
+        //         "totalOil": 100
+        //     }];
+        //
+        //     var data2 = [];
+        //     for (var i = 0; i < data10.length; i++) {
+        //         var x = data10[i].x;
+        //         var y = data10[i].y;
+        //         var z = data10[i].z;
+        //         data2.push([x, y, z]);
+        //     }
+        //
+        //     var myChart = echarts.init(document.getElementById('main-3d'));
+        //     option = {
+        //         grid3D: {},
+        //         xAxis3D: {},
+        //         yAxis3D: {},
+        //         // zAxis3D: { max: 200 },
+        //         zAxis3D: {},
+        //         //装载数据
+        //         series: [{
+        //             type: 'scatter3D',
+        //             // type: 'line3D',
+        //             data: data1
+        //         }, {
+        //             type: 'line3D',
+        //             lineStyle: {
+        //                 color: 'rgb(165,  0, 38)',
+        //                 width: 1
+        //             },
+        //             data: data1
+        //         }, {
+        //             type: 'scatter3D',
+        //             // type: 'line3D',
+        //             data: data2
+        //         }, {
+        //             type: 'line3D',
+        //             lineStyle: {
+        //                 color: 'rgb(165,  0, 38)',
+        //                 width: 1
+        //             },
+        //             data: data2
+        //         }
+        //         ]
+        //     };
+        //     myChart.setOption(option);
+        // });
+
+
+        var int=self.setInterval("process()",5000);
+
+        function process()
+        {
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('main-3d'));
+
+            $.get('http://localhost:8086/FUNDSLAB/location', function (data) {
+                // console.log(data);
+                var datalist = [];
+                console.log(typeof(data));
+                for ( i = 0; i <data.length; i++) {
+                    var item = [];
+                    for (j = 0; j < data[i].length; j++) {
+                        x = data[i][j].x;
+                        y = data[i][j].y;
+                        z = data[i][j].z;
+                        item.push([x, y, z]);
+                    }
+                    datalist.push(item);
+                }
+
+                var s = [];
+                for (k = 0; k < datalist.length; k++) {
+                    var temp1 = {
+                        type: 'scatter3D',
+                        // data: data1
+                        data: datalist[k]
+                    };
+                    var temp2 = {
+                        type: 'line3D',
+                        lineStyle: {
+                            color: 'rgb(165,  0, 38)',
+                            width: 1
+                        },
+                        data: datalist[k]
+                    };
+                    s.push(temp1);
+                    s.push(temp2);
+                }
+
+                myChart.setOption({
+                    grid3D: {},
+                    xAxis3D: {},
+                    yAxis3D: {},
+                    // zAxis3D: { max: 200 },
+                    zAxis3D: {},
+                    // edgeSymbol : ['circle', 'arrow'],//边两端的标记类型，可以是一个数组分别指定两端，也可以是单个统一指定。默认不显示标记，常见的可以设置为箭头，如下：edgeSymbol: ['circle', 'arrow']
+                    // edgeSymbolSize : 10,//边两端的标记大小，可以是一个数组分别指定两端，也可以是单个统一指定。
+                    //装载数据
+                    series: s
+                })
+            }, 'json')
+        }
+    </script>
+
+</body>
+</html>

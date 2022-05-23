@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>时延柱状图</title>
+
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- 引入 echarts.js -->
+    <script src="https://cdn.staticfile.org/echarts/4.3.0/echarts.min.js"></script>
+    <script src="js/echarts-gl.min.js"></script>
+</head>
+<body>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+<div id="main-columnar" style="width: 500px;height: 500px;"></div>
+<script type="text/javascript">
+5    var int=self.setInterval("process1()",5000);
+
+    function process1()
+    {
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main-columnar'));
+
+        $.get('http://localhost:8086/FUNDSLAB/getData', function (data) {
+            // console.log(data);
+            console.log(typeof(data));
+            console.log(data.xData);
+            console.log(data.yData);
+
+            var xData = data.xData;
+            var yData = data.yData;
+
+            myChart.setOption({
+                // 标题
+                title: {
+                    text: '各节点时延柱状图',
+                    left: 'left',
+                    borderWidth: 2
+                },
+                // 工具箱
+                toolbox: {
+                    show: true,
+                    feature: {
+                        saveAsImage: {
+                            show: true
+                        },
+                        restore: {
+                            show: true
+                        },
+                        dataView: {
+                            show: true
+                        },
+                        magicType: {
+                            type: ['line', 'bar']
+                        }
+
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                // 图例
+                legend: {
+                    data: ['时延'],
+                    textStyle:{
+                        fontSize:18,
+                    }
+
+                },
+                // x轴
+                xAxis: {
+                    data: xData,
+                    axisLabel:{
+                        textStyle:{
+                            fontSize:20
+                        }
+                    }
+                },
+                yAxis: {
+                    axisLabel:{
+                        textStyle:{
+                            fontSize:20
+                        }
+                    }
+                },
+                // 数据
+                series: [{
+                    name: '时延',
+                    type: 'bar',
+                    data: yData,
+                    markPoint: {
+                        data: [
+                            {type: 'max', name: '最大值'},
+                            // {type: 'min', name: '最小值', symbol: 'arrow'}
+                        ]
+                    },
+                    markLine: {
+                        data: [
+                            {type: 'average', name: '平均值'}
+                        ]
+                    }
+                }
+                ]
+            });
+        }, 'json');
+    }
+
+</script>
+</body>
+</html>

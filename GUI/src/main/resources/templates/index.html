@@ -1,0 +1,1184 @@
+<!--<!DOCTYPE html>-->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- 引入 echarts.js -->
+    <script src="https://cdn.staticfile.org/echarts/4.3.0/echarts.min.js"></script>
+    <script src="js/echarts-gl.min.js"></script>
+
+    <link rel="stylesheet" th:href="@{/css/global.css}" />
+    <script th:src="@{/js/global.js}"></script>
+    <script th:src="@{js/index.js}"></script>
+    <title>Front page</title>
+</head>
+<body>
+    <div class="container">
+        <div class="row" >
+            <div class="col-sm-8">
+                <br>
+                <h4 align="center" font-size=12px style="font-weight:bold" >The node location 3D graph</h4>
+                <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+                <div id="main" style="width: 600px;height:500px;"></div>
+            </div>
+            <div class="col-sm-4">
+                <br><br>
+                <h4  font-size=12px style="font-weight:bold" >  Functions </h4>
+                <br>
+
+                <!--添加节点-->
+                <button type="button" class="btn btn-primary btn-sm position-absolute rt-0" data-toggle="modal" data-target="#publishModal">Add node</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+                <!-- 弹出框 添加节点-->
+                <div class="modal fade" id="publishModal" tabindex="-1" role="dialog" aria-labelledby="publishModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="publishModalLabel">Add node</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form class="form-horizontal" role="form">
+                                    <div class="form-group">
+                                        <label for="node-id" class="col-sm-2 control-label">id:</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" class="form-control" id="node-id" placeholder="Please enter node id to add:"  onblur="testId(this, this.value)">
+                                        </div>
+                                    </div>
+
+                                    <!--弹出框 显示是否节点已存在-->
+                                    <div class="modal fade bs-example-modal-sm" id="idModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-sm" role="document">
+                                            <div class="modal-content" >
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="idModalLabel">Notice</h5>
+                                                </div>
+                                                <div class="modal-body" id="idBody">
+                                                    <p class="lead" id="test-id-msg">node don't exit!</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Yes</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="node-location-x" class="col-sm-2 control-label">x-coordinate:</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" class="form-control" id="node-location-x" placeholder="please enter x-coordinate:">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="node-location-y" class="col-sm-2 control-label">y-coordinate:</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" class="form-control" id="node-location-y" placeholder="please enter y-coordinate:">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="node-location-z" class="col-sm-2 control-label">z-coordinate:</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" class="form-control" id="node-location-z" placeholder="please enter z-coordinate:">
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                <button type="button" class="btn btn-primary" id="publishBtn">Yes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 提示框 -->
+                <div class="modal fade" id="hintModal" tabindex="-1" role="dialog" aria-labelledby="hintModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-sm" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="hintModalLabel">Notice</h5>
+                            </div>
+                            <div class="modal-body" id="hintBody">
+                                Ok!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--更改节点位置-->
+                <button type="button" class="btn btn-primary btn-sm position-absolute rt-0" data-toggle="modal" data-target="#updateLocationModal">Update node location</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <!-- 弹出框-->
+                <div class="modal fade" id="updateLocationModal" tabindex="-1" role="dialog" aria-labelledby="updateLocationModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="updateLocationLabel">Update the location of node</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+
+                            <div class="modal-body">
+                                <form class="form-horizontal" role="form">
+                                    <div class="form-group">
+                                        <label for="node-update-id" class="col-sm-2 control-label">node id:</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" class="form-control" id="node-update-id" placeholder="Please enter node id to update:"  onblur="testId2(this, this.value)">
+                                        </div>
+                                    </div>
+                                    <!--弹出框 显示是否节点已存在-->
+                                    <div class="modal fade bs-example-modal-sm" id="id2Modal" tabindex="-1" role="dialog" aria-labelledby="id2Label" aria-hidden="true">
+                                        <div class="modal-dialog modal-sm" role="document">
+                                            <div class="modal-content" >
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="id2ModalLabel">Notice</h5>
+                                                </div>
+                                                <div class="modal-body" id="id2Body">
+                                                    <p class="lead" id="test-id-msg2">The node doesn't exit!</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Yes</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="node-location2-x" class="col-sm-2 control-label">x-coordinate:</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" class="form-control" id="node-location2-x" placeholder="please enter x-coordinate:">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="node-location2-y" class="col-sm-2 control-label">y-coordinate:</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" class="form-control" id="node-location2-y" placeholder="please enter y-coordinate:">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="node-location2-z" class="col-sm-2 control-label">z-coordinate:</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" class="form-control" id="node-location2-z" placeholder="please enter z-coordinate:">
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                <button type="button" class="btn btn-primary" id="updateLocationBtn">Yes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 提示框 -->
+                <div class="modal fade" id="xyzModal" tabindex="-1" role="dialog" aria-labelledby="xyzModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-sm" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="xyzModalLabel">Notice</h5>
+                            </div>
+                            <div class="modal-body" id="xyzBody">
+                                OK!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--删除节点-->
+                <button type="button" class="btn btn-primary btn-sm position-absolute rt-0" data-toggle="modal" data-target="#deleteIdModal">Delete node</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <!-- 弹出框-->
+                <div class="modal fade" id="deleteIdModal" tabindex="-1" role="dialog" aria-labelledby="deleteIdModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-sm" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteIdLabel">Delete node</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+
+                            <div class="modal-body">
+                                <form class="form-horizontal" role="form">
+                                    <div class="form-group">
+                                        <label for="node-update-id" class="col-sm-3 control-label">id:</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="delete-id" placeholder="please enter the node id:" >
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                <button type="button" class="btn btn-primary" id="deleteIdBtn">Yes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!---->
+
+                <!-- 提示框 -->
+                <div class="modal fade" id="xyModal" tabindex="-1" role="dialog" aria-labelledby="xyModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-sm" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="xyModalLabel">Notice</h5>
+                            </div>
+                            <div class="modal-body" id="xyBody">
+                                OK!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <br>
+
+
+                <!--节点带宽设定-->
+                <button type="button" class="btn btn-primary btn-sm position-absolute rt-0" data-toggle="modal" data-target="#initModal">Bandwidth setting</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <!-- 弹出框 系统带宽设定-->
+                <div class="modal fade" id="initModal" tabindex="-1" role="dialog" aria-labelledby="initModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="initModalLabel">Bandwidth setting</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form class="form-horizontal" role="form">
+                                    <div class="form-group">
+                                        <label for="nodeid" class="col-sm-3 control-label">node:</label>
+                                        <div class="col-sm-5"  >
+                                            <input type="text" class="form-control" id="nodeid" name="nodeid" placeholder="please enter the node id:">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="bandwidth" class="col-sm-3 control-label">bandwidth:</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" class="form-control" id="bandwidth" name="bandwidth" placeholder="please enter bandwidth(unit:bps):">
+                                        </div>
+                                    </div>
+
+                                    <!--<div class="form-group">-->
+                                    <!--<label for="nodeinit" class="col-sm-3 control-label">是否初始化:</label>-->
+                                    <!--<div class="col-sm-1">-->
+                                    <!--<input type="checkbox" class="form-control" id="nodeinit" name="nodeinit">-->
+                                    <!--</div>-->
+                                    <!--</div>-->
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                <button type="button" class="btn btn-primary" id="initBtn">Yes</button>
+                                <!--<button type="button" class="btn btn-primary">Yes</button>-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 提示框 -->
+                <div class="modal fade" id="hideModal" tabindex="-1" role="dialog" aria-labelledby="hideModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-sm" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="hideModalLabel">Notice</h5>
+                            </div>
+                            <div class="modal-body" id="hideBody">
+                                OK!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--模拟噪声信道-->
+                <button type="button" class="btn btn-primary btn-sm position-absolute rt-0" data-toggle="modal" data-target="#poorchannel">Poor channel</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <div class="modal fade" id="poorchannel" tabindex="-1" role="dialog" aria-labelledby="publishModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="poorchannelLabel">Poor channel</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form class="form-horizontal" role="form" th:action="poorChannelGet" style="display: inline" >
+
+
+
+
+
+                                    <div class="form-group">
+                                        <label for="node-location2-y" class="col-sm-2 control-label">id:</label>
+                                        <div class="col-sm-5">
+                                            <input name="id" class="form-control" placeholder="please enter the node id:">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="node-location2-y" class="col-sm-2 control-label">poor channel:</label>
+                                        <div class="col-sm-5">
+                                            <input name="poorChannel"  class="form-control" placeholder="please enter the state(0/1):">
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal" th:onclick="sxw()">No</button>
+                                        <button   class="btn btn-primary" style="display: inline-block;"  >Yes</button>
+                                        <!--<button type="button" class="btn btn-primary">Yes</button>-->
+                                    </div>
+
+                                </form>
+                            </div>
+                           <!-- <div class="modal-footer">
+                            </div>-->
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!--模拟多路径传输-->
+                <button type="button" class="btn btn-primary btn-sm position-absolute rt-0" data-toggle="modal" data-target="#multiPathTransfer">Multipath transfer</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <div class="modal fade" id="multiPathTransfer" tabindex="-1" role="dialog" aria-labelledby="publishModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="multiPathTransferLabel">MultiPath transfer</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form class="form-horizontal" role="form" th:action="multiPathTransferGet" >
+                                    <div class="form-group">
+                                        <label for="node-location2-y" class="col-sm-2 control-label">source id:</label>
+                                        <div class="col-sm-5">
+                                            <input name="sourceId" class="form-control" placeholder="please enter the source node id:">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="node-location2-y" class="col-sm-2 control-label">destination id:</label>
+                                        <div class="col-sm-5">
+                                            <input name="destinationId"  class="form-control" placeholder="please enter the destination node id:">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="node-location2-y" class="col-sm-2 control-label">multipath:</label>
+                                        <div class="col-sm-5">
+                                            <input name="multiPath"  class="form-control" placeholder="please enter the multipath(ex:1/2/3):">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="node-location2-y" class="col-sm-2 control-label">message:</label>
+                                        <div class="col-sm-5">
+                                            <input name="multiPathMessage"  class="form-control" placeholder="please enter the message:">
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal" th:onclick="sxw()">No</button>
+                                        <button   class="btn btn-primary" style="display: inline-block;"  >Yes</button>
+                                        <!--<button type="button" class="btn btn-primary">Yes</button>-->
+                                    </div>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <br>
+                <br>
+                <h4  font-size=12px style="font-weight:bold" >  Data visualization </h4>
+                <br>
+
+                <!--查看节点0时延-->
+                <button type="button" class="btn btn-primary btn-sm position-absolute rt-0" data-toggle="modal" data-target="#delayModal">Node 0 latency</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <!-- 弹出框 -->
+                <div class="modal fade" id="delayModal" tabindex="-1" role="dialog" aria-labelledby="delayModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="delayLabel">The delay of node 0(eg)</h5>
+                            </div>
+                            <div class="modal-body">
+<!--                                <div id="main-columnar" style="width: 780px;height: 500px;"></div>-->
+                                <div id="main-columnar" style="width: 1000px;height: 500px;"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">Yes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--数据包数-->
+                <button type="button" class="btn btn-primary btn-sm position-absolute rt-0" data-toggle="modal" data-target="#packetModal">Packet statistics</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <!-- 弹出框 -->
+                <div class="modal fade" id="packetModal" tabindex="-1" role="dialog" aria-labelledby="packetModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="packetLabel">The amounts of packets</h5>
+                            </div>
+                            <div class="modal-body">
+<!--                                <div id="main-columnar2" style="width: 780px;height: 500px;"></div>-->
+                                <div id="main-columnar2" style="width: 800px;height: 500px;"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">Yes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <!--数据链数量统计-->
+                <button type="button" class="btn btn-primary btn-sm position-absolute rt-0" data-toggle="modal" data-target="#subnetModal">Statistics on data chains</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <!-- 弹出框 -->
+                <div class="modal fade" id="subnetModal" tabindex="-1" role="dialog" aria-labelledby="subnetModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="subLabel">The amounts of data chains</h5>
+                            </div>
+                            <div class="modal-body">
+<!--                                <div id="main-columnar3" style="width: 780px;height: 500px;"></div>-->
+                                <div id="main-columnar3" style="width: 830px;height: 500px;"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">Yes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!--节点列表-->
+                <div th:if="${voList!=null}"  >
+                    <br>
+                    <h4  font-size=12px style="font-weight:bold" >  Nodes </h4>
+                    <br>
+                    <wxt  th:each="map:${voList}"  >
+
+                        <button type="button" class="btn btn-primary btn-sm position-absolute rt-0 " th:utext="|Node:${map.location.id}|" th:onclick="|like(this, ${map.location.id});|" >11111</button>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <wxt th:if="${map.location.id<10}"  >
+                            &nbsp;
+                        </wxt>
+
+                        <div th:if="${map.location.id%5==4}"  >
+                            <br>
+                        </div>
+
+
+                        <!-- 弹出框 -->
+                        <div class="modal fade bs-example-modal-sm col-sm-offset-8" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-sm" role="document">
+                                <div class="modal-content" >
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="myModalLabel">node imformation</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body" id="myBody">
+                                        id:<span id="test-id">-1</span><br>
+<!--                                        驾驶员:<span id="test-pilot">-1</span><br>-->
+<!--                                        弹药量:<span id="test-ammunition">-1</span>/<span id="test-totalAmmunition">-1</span><br>-->
+<!--                                        弹药量:<span id="test-oil">-1</span>/<span id="test-totalOil">-1</span><br>-->
+                                        location:(<span id="test-location-x">-1</span>,<span id="test-location-y">-1</span>,<span id="test-location-z">-1</span>)<br>
+                                        <hr>
+                                        destination node:<input type="text" id = "test-destinationNode"><br><br>
+                                        message sent:<input type="text" id = "test-content">
+                                        <hr>
+
+                                        <!--11111-->
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                        <button type="button" class="btn btn-primary" id="sentBtn" onclick="send();">Yes</button>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </wxt>
+                </div>
+
+                <div th:if="${voList==null}">
+                    <br><br><br>There is no node!<br><br>
+                </div>
+
+                <!-- 提示框 -->
+                <div class="modal fade" id="sendModal" tabindex="-1" role="dialog" aria-labelledby="sendModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-sm" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="sendModalLabel">Notice</h5>
+                            </div>
+                            <div class="modal-body" id="sendBody">
+                                OK!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function sxw(){
+        }
+    </script>
+    <script>
+        function send() {
+            $("#myModal").modal("hide");
+
+            //获取目的节点和内容
+            var id = document.getElementById("test-id").innerText;
+            var destinationNode = document.getElementById("test-destinationNode").value;
+            var content = document.getElementById("test-content").value;
+            console.log(id);
+            console.log(destinationNode);
+            console.log(content);
+
+            // 发送异步请求
+            $.post(
+                CONTEXT_PATH + "/send",
+                {
+                    "fromId": id,
+                    "toId": destinationNode,
+                    "content": content
+                },
+                function (data) {
+                    data = $.parseJSON(data);
+                    console.log(data.msg);
+                    // alert(data.msg);
+                    // 在提示框中显示返回消息
+                    $("#sendBody").text(data.msg);
+                    //显示提示框
+                    $("#sendModal").modal("show");
+                    //两秒后自动隐藏提示框
+                    setTimeout(function () {
+                        $("#sendModal").modal("hide");
+                        // if (data.code == 0) {
+                        //     window.location.reload();
+                        // }
+                    }, 5000);
+                }
+            );
+        }
+    </script>
+
+    <script>
+        function testId(btn, id) {
+            // console.log(id);
+            $.get(
+                CONTEXT_PATH + "/test/" + id,
+                function(data) {
+                    data = $.parseJSON(data);
+                    if(data.code == 0) {
+                        console.log(data.msg)
+                        // alert(data.msg);
+                    } else {
+                        console.log(data.msg);
+                        // document.getElementById('test-id-msg').innerHTML = data.msg;
+                        // // alert(data.msg);
+                        // //显示提示框
+                        // $("#idModal").modal('show');
+
+                        //在提示框中显示返回消息
+                        $("#hintBody").text(data.msg);
+                        //显示提示框
+                        $("#hintModal").modal("show");
+                        //两秒后自动隐藏提示框
+                        setTimeout(function () {
+                            $("#hintModal").modal("hide");
+                        }, 2000);
+                    }
+                }
+            );
+        }
+    </script>
+
+    <script>
+        function testId2(btn, id) {
+            // console.log(id);
+            $.get(
+                CONTEXT_PATH + "/test2/" + id,
+                function(data) {
+                    data = $.parseJSON(data);
+                    if(data.code == 1) {
+                        console.log(data.msg)
+                        // alert(data.msg);
+                    } else {
+                        console.log(data.msg);
+                        // document.getElementById('test-id-msg').innerHTML = data.msg;
+                        // // alert(data.msg);
+                        // //显示提示框
+                        // $("#idModal").modal('show');
+
+                        //在提示框中显示返回消息
+                        $("#updateBody").text(data.msg);
+                        //显示提示框
+                        $("#updateModal").modal("show");
+                        //两秒后自动隐藏提示框
+                        setTimeout(function () {
+                            $("#updateModal").modal("hide");
+                        }, 2000);
+                    }
+                }
+            );
+        }
+    </script>
+
+    <!--<script>
+        function testczc(){
+            $.get(
+                CONTEXT_PATH+"poorupdate",
+                function (){
+                    document.getElementById('test-id').innerHTML=poorc;
+                }
+            )
+
+        }
+    </script>-->
+    <script>
+        function like(btn, id) {
+            // console.log(id);
+            $.get(
+                CONTEXT_PATH + "/info/" + id,
+                function(data) {
+                    data = $.parseJSON(data);
+                    if(data.code == 0) {
+                        document.getElementById('test-id').innerHTML = data.location.id;
+                       // document.getElementById('test-pilot').innerHTML = data.location.pilot;
+                      //  document.getElementById('test-ammunition').innerHTML = data.location.ammunition;
+                      //  document.getElementById('test-totalAmmunition').innerHTML = data.location.totalAmmunition;
+                      //  document.getElementById('test-oil').innerHTML = data.location.oil;
+                    //   document.getElementById('test-totalOil').innerHTML = data.location.totalOil;
+                        document.getElementById('test-location-x').innerHTML = data.location.x;
+                        document.getElementById('test-location-y').innerHTML = data.location.y;
+                        document.getElementById('test-location-z').innerHTML = data.location.z;
+
+                        // document.getElementById('test-id').value = data.location.id;
+                        // document.getElementById('test-pilot').value = data.location.pilot;
+                        // document.getElementById('test-ammunition').value = data.location.ammunition;
+                        // document.getElementById('test-totalAmmunition').value = data.location.totalAmmunition;
+                        // document.getElementById('test-oil').value = data.location.oil;
+                        // document.getElementById('test-totalOil').value = data.location.totalOil;
+                        // document.getElementById('test-location-x').value = data.location.x;
+                        // document.getElementById('test-location-y').value = data.location.y;
+                        // document.getElementById('test-location-z').value = data.location.z;
+                        //显示提示框
+                        $("#myModal").modal('show');
+                        // //在提示框中显示返回消息
+                        // $("#myModal").text(data.msg);
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            );
+        }
+    </script>
+
+    <script type="text/javascript">
+
+        var int = self.setInterval("process()",2000);
+
+        function process()
+        {
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('main'));
+
+            $.get('http://localhost:8086/FUNDSLAB/location', function (data) {
+                // console.log(data);
+                // console.log(typeof(data));
+                var datalist = [];
+                for ( i = 0; i <data.length; i++) {
+                    var item = [];
+                    for (j = 0; j < data[i].length; j++) {
+                        x = data[i][j].x;
+                        y = data[i][j].y;
+                        z = data[i][j].z;
+                        item.push([x, y, z]);
+                    }
+                    datalist.push(item);
+                }
+
+                var s = [];
+                for (k = 0; k < datalist.length; k++) {
+                    var temp1 = {
+                        type: 'scatter3D',
+                        // data: data1
+                        data: datalist[k]
+                    };
+                    var temp2 = {
+                        type: 'line3D',
+                        lineStyle: {
+                            color: 'rgb(165,  0, 38)',
+                            width: 1
+                        },
+                        data: datalist[k]
+                    };
+                    s.push(temp1);
+                    s.push(temp2);
+                }
+                // console.log(s.length);
+
+                myChart.setOption({
+                    grid3D: {},
+                    xAxis3D: {},
+                    yAxis3D: {},
+                    // zAxis3D: { max: 200 },
+                    zAxis3D: {},
+                    //装载数据
+                    series: s
+                })
+            }, 'json')
+        }
+        // var int=self.setInterval("process()",3000)
+        // function process()
+        // {
+        //     // 基于准备好的dom，初始化echarts实例
+        //     var myChart = echarts.init(document.getElementById('main'));
+        //
+        //     $.get('http://localhost:8080/yangzhou/location', function (data) {
+        //         // console.log(data)
+        //         var data1 = [];
+        //         for (var i = 0; i < data.length; i++) {
+        //             var x = data[i].x;
+        //             var y = data[i].y;
+        //             var z = data[i].z;
+        //             data1.push([x, y, z]);
+        //         }
+        //         myChart.setOption({
+        //             grid3D: {},
+        //             xAxis3D: {},
+        //             yAxis3D: {},
+        //             // zAxis3D: { max: 200 },
+        //             zAxis3D: {},
+        //             series: [{
+        //                 type: 'scatter3D',
+        //                 data: data1
+        //             }]
+        //         })
+        //     }, 'json')
+        // }
+    </script>
+
+    <script type="text/javascript">
+
+        var int=self.setInterval("process1()",2000);
+
+        function process1()
+        {
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('main-columnar'));
+
+            $.get('http://localhost:8086/FUNDSLAB/getData/0', function (data) {
+                // // console.log(data);
+                // console.log(typeof(data));
+                // console.log(data.xData);
+                // console.log(data.yData);
+
+                var xData = data.xData;
+                var yData = data.yData;
+                var avgData = data.avgData;
+
+                myChart.setOption({
+                    // 标题
+                    title: {
+                        // text: 'The Delay Of Node 0',
+                        // left: 'left',
+                        // borderWidth: 2,
+                        // textStyle:{
+                        //     fontSize:20,
+                        // }
+                    },
+                    // 工具箱
+                    toolbox: {
+                        show: true,
+                        feature: {
+                            saveAsImage: {
+                                show: true
+                            },
+                            restore: {
+                                show: true
+                            },
+                            dataView: {
+                                show: true
+                            },
+                            magicType: {
+                                type: ['line', 'bar']
+                            }
+
+                        }
+                    },
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    // 图例
+                    legend: {
+                        data: ['the worst delay','average delay'],
+                        textStyle:{
+                            fontSize:30,
+                            //padding: [10, 0, 0, 60]
+
+                        }
+                    },
+                    // x轴
+                    xAxis: {
+                        data: xData,
+                        name: 'Source node',
+                        nameLocation: 'middle',
+                        nameGap: 30,
+
+                        nameTextStyle :{
+                            fontSize: 30,
+                            //color: '#65ABE7',
+                            padding: [0, 0, 0, 60]
+                        },
+                        axisLabel:{
+                            textStyle:{
+                                fontSize:28
+                            },
+                        }
+                    },
+                    // yAxis: {
+                    //     name: 'Delay/μs',
+                    //     nameLocation: 'middle',
+                    //     nameRotate:'90',
+                    //     nameGap: 45,
+                    //     nameTextStyle :{
+                    //         fontSize: 30,
+                    //         //color: '#65ABE7',
+                    //         padding: [0, 0, 0, 0]
+                    //     },
+                    //     axisLabel:{
+                    //         textStyle:{
+                    //             fontSize:32,
+                    //         },
+                    //     }
+                    // },
+                    //噪声信道节点，占空间较大
+                    yAxis: {
+                        name: 'Delay/μs',
+                        //nameLocation: 'middle',
+                        //nameRotate:'90',
+                        nameGap: 25,
+                        nameTextStyle :{
+                            fontSize: 30,
+                            //color: '#65ABE7',
+                            padding: [0, 0, 0, 0]
+                        },
+                        axisLabel:{
+                            textStyle:{
+                                fontSize:32,
+                            },
+                        }
+                    },
+                    // 数据
+                    series: [{
+                        name: 'the worst delay',
+                        type: 'bar',
+                        data: yData,
+                        // markPoint: {
+                        //     data: [
+                        //         {type: 'max', name: 'maximum value'},
+                        //         // {type: 'min', name: '最小值', symbol: 'arrow'}
+                        //     ]
+                        // },
+                        markLine: {
+                            data: [
+                                {type: 'average', name: 'average value'}
+                            ]
+                        }
+                    },
+                        {
+                            name: 'average delay',
+                            type: 'bar',
+                            data: avgData,
+                            // markPoint: {
+                            //     data: [
+                            //         {type: 'max', name: 'maximum value'},
+                            //         // {type: 'min', name: '最小值', symbol: 'arrow'}
+                            //     ]
+                            // },
+                            markLine: {
+                                itemStyle:{
+                                    normal:{
+                                        lable: {
+                                            show: true,
+                                            color: "red",
+                                            fontSize: 120
+                                        }
+                                    }
+                                },
+                                data: [
+                                    {type: 'average', name: 'average'}
+                                ]
+                            }
+                        }
+                    ]
+                });
+            }, 'json');
+        }
+
+    </script>
+
+    <script type="text/javascript">
+
+        var int=self.setInterval("process2()",2000);
+        function process2()
+        {
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('main-columnar2'));
+
+            $.get('http://localhost:8086/FUNDSLAB/getPacket', function (data) {
+                // console.log(data);
+                // console.log(typeof(data));
+                // console.log(data.xData);
+                // console.log(data.yData);
+
+                var xData = data.xData;
+                var yData = data.yData;
+
+                myChart.setOption({
+                    // 标题
+                    // title: {
+                    //     text: 'Packet Statistics Graph',
+                    //     left: 'left',
+                    //     borderWidth: 2,
+                    //     textStyle:{
+                    //         fontSize:20,
+                    //     }
+                    // },
+                    // 工具箱
+                    toolbox: {
+                        show: true,
+                        feature: {
+                            saveAsImage: {
+                                show: true
+                            },
+                            restore: {
+                                show: true
+                            },
+                            dataView: {
+                                show: true
+                            },
+                            magicType: {
+                                type: ['line', 'bar']
+                            }
+                        }
+                    },
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    // 图例
+                    legend: {
+                        data: ['total number of packets'],
+                        textStyle:{
+                            fontSize:30,
+                            padding: [0, 0, 0, 30]
+                        }
+                    },
+                    // x轴
+                    xAxis: {
+                        data: xData,
+                        name: 'Destination node',
+                        nameLocation: 'middle',
+                        nameGap: 35,
+                        nameTextStyle :{
+                            fontSize: 30,
+                            padding: [0, 0, 0, 60]
+                            //color: '#65ABE7',
+                        },
+                        axisLabel:{
+                            textStyle:{
+                                fontSize:28
+                            },
+                        }
+                    },
+                    yAxis: {
+                        name: 'Unit/pcs',
+                        //nameLocation: 'middle',
+                        //nameRotate:'90',
+                        nameGap: 25,
+                        nameTextStyle :{
+                            fontSize: 30,
+                            padding: [0, 0, 0, 0]
+                            //color: '#65ABE7',
+                        },
+                        axisLabel:{
+                            textStyle:{
+                                fontSize:32
+                            },
+                        }
+                    },
+                    // 数据
+                    series: [{
+                        name: 'total number of packets',
+                        //name: '数据包总数',
+                        type: 'bar',
+                        barWidth: '35',
+                        data: yData,
+                        itemStyle:{
+                            normal:{
+                                color:function (params) {
+                                    var colorList = ['#61a0a8'];
+                                    //, '#d48265', '#91c7ae','#749f83', '#ca8622'
+                                    return colorList[params.dataIndex]
+                                }
+                            }
+                        },
+                        markPoint: {
+                            itemStyle:{
+                                normal:{
+                                    lable: {
+                                        show: true,
+                                        fontSize: 120
+                                    }
+                                }
+                            },
+                            data: [
+                                {type: 'max', name: 'maximum value'},
+                                //type: 'max', name: '最大值'},
+                                // {type: 'min', name: '最小值', symbol: 'arrow'}
+                            ]
+                        },
+                        markLine: {
+                            itemStyle:{
+                                normal:{
+                                    lable: {
+                                        show: true,
+                                        color: "red",
+                                        fontSize: 120
+                                    }
+                                }
+                            },
+                            data: [
+                                {type: 'average', name: '平均值'}
+                            ]
+                        }
+                    }
+                    ]
+                });
+            }, 'json');
+        }
+    </script>
+
+    <script type="text/javascript">
+
+        var int=self.setInterval("process3()",2000);
+        function process3()
+        {
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('main-columnar3'));
+
+            $.get('http://localhost:8086/FUNDSLAB/getSub', function (data) {
+
+                var xData = data.xData;
+                var yData = data.yData;
+
+                myChart.setOption({
+                    // 标题
+                    title: {
+                        text:'Data Link Statistics',
+                        // text: '数据链统计图',
+                        left: 'left',
+                        borderWidth: 2,
+                        textStyle:{
+                            fontSize:15,
+                        }
+                    },
+                    // 工具箱
+                    toolbox: {
+                        show: true,
+                        feature: {
+                            saveAsImage: {
+                                show: true
+                            },
+                            restore: {
+                                show: true
+                            },
+                            dataView: {
+                                show: true
+                            },
+                            magicType: {
+                                type: ['line', 'bar']
+                            }
+
+                        }
+                    },
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    // 图例
+                    legend: {
+                        data: ['the amounts of data links'],
+                        textStyle:{
+                            fontSize:18,
+                        }
+                        //data: ['数据链数']
+                    },
+                    // x轴
+                    xAxis: {
+                        data: xData,
+                        name: 'Time',
+                        nameTextStyle :{
+                            fontSize: 15
+                        },
+                        axisLabel:{
+                            textStyle:{
+                                fontSize:16
+                            },
+                        }
+                        //name: '时间',
+                    },
+                    yAxis: {
+                        name: 'PCS',
+                        nameTextStyle :{
+                            fontSize: 17
+                        },
+                        axisLabel:{
+                            textStyle:{
+                                fontSize:16
+                            },
+                        }
+                        //name: '单位:个'
+                    },
+                    // 数据
+                    series: [{
+                        name: 'the amounts of data links',
+                        //name: '数据链数',
+                        type: 'line',
+                        // type: 'bar',
+                        data: yData
+                        // markPoint: {
+                        //     data: [
+                        //         {type: 'max', name: '最大值'},
+                        //         // {type: 'min', name: '最小值', symbol: 'arrow'}
+                        //     ]
+                        // }
+                    }
+                    ]
+                });
+            }, 'json');
+        }
+    </script>
+</body>
+</html>
+

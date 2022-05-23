@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Bootstrap 实例 - 模态框（Modal）插件</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<h2>创建模态框（Modal）</h2>
+<!-- 按钮触发模态框 -->
+<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+    开始演示模态框
+</button>
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title">警告！</h5>
+            </div>
+            <div class="modal-body" style="background-color: #F9D7DB;text-align: center;margin: 0 auto;font-family: 华文楷体;">
+                <span style="font-size: 21px; text-align: center;margin: 0 auto;color: #60b6ff;"><strong id="warnmsg"></strong></span>
+                <p><span style="font-size: 24px; text-align: center;margin: 0 auto;"><strong >您确定删除吗？</strong></span></p>
+            </div>
+
+            <div class="modal-footer">
+                <div class="btn-group" role="group" style="padding-right: 80px;">
+                    <button type="button" class="btn btn-primary " onclick="CheckPost()" data-dismiss="modal" style="width: 90px;"
+                            id="deleteHaulBtn" >确认</button>
+                </div>
+                <div class="btn-group" role="group"  style="margin-right: 100px;">
+                    <button type="button" class="btn btn-default " style="width: 90px;"
+                            data-dismiss="modal">取消</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    //模态框居中问题 start
+    function centerModals() {
+        $('.modal').each(function(i) {
+            var $clone = $(this).clone().css('display', 'block').appendTo('body');
+            var top = Math.round(($clone.height() - $clone.find('.modal-content').height()) / 2);
+            top = top > 80 ? top : 0;
+            $clone.remove();
+            $(this).find('.modal-content').css("margin-top", top - 80);
+        });
+    }
+    // 在模态框出现的时候调用垂直居中方法
+    $('.modal').on('show.bs.modal', centerModals);
+    // 在窗口大小改变的时候调用垂直居中方法
+    $(window).on('resize', centerModals);
+    //模态框居中问题end
+</script>
+
+<!--&lt;!&ndash; 模态框（Modal） &ndash;&gt;-->
+<!--<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">-->
+    <!--<div class="modal-dialog">-->
+        <!--<div class="modal-content">-->
+            <!--<div class="modal-header">-->
+                <!--<button type="button" class="close" data-dismiss="modal" aria-hidden="true">-->
+                    <!--&times;-->
+                <!--</button>-->
+                <!--<h4 class="modal-title" id="myModalLabel">-->
+                    <!--模态框（Modal）标题-->
+                <!--</h4>-->
+            <!--</div>-->
+            <!--<div class="modal-body">-->
+                <!--点击关闭按钮检查事件功能。-->
+                <!--<i id="test-id">10</i>-->
+            <!--</div>-->
+            <!--<div class="modal-footer">-->
+                <!--<button type="button" class="btn btn-default" data-dismiss="modal">关闭-->
+                <!--</button>-->
+                <!--<button type="button" class="btn btn-primary" data-dismiss="modal">-->
+                    <!--提交更改-->
+                <!--</button>-->
+            <!--</div>-->
+        <!--</div>&lt;!&ndash; /.modal-content &ndash;&gt;-->
+    <!--</div>&lt;!&ndash; /.modal-dialog &ndash;&gt;-->
+<!--</div>&lt;!&ndash; /.modal &ndash;&gt;-->
+
+<!--<script>-->
+    <!--$(function () { $('#myModal').modal('hide')});-->
+<!--</script>-->
+<!--<script>-->
+    <!--$(function () { $('#myModal').on('show.bs.modal', function () {-->
+        <!--alert('嘿，我听说您喜欢模态框...');})-->
+
+    <!--});-->
+<!--</script>-->
+
+</body>
+</html>

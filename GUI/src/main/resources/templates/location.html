@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>节点位置3D图</title>
+    <script src="https://cdn.staticfile.org/jquery/2.2.4/jquery.min.js"></script>
+    <!-- 引入 echarts.js -->
+    <script src="https://cdn.staticfile.org/echarts/4.3.0/echarts.min.js"></script>
+    <script src="js/echarts-gl.min.js"></script>
+</head>
+<body>
+<h5 th:utext="${title}">title</h5>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+<div id="main" style="width: 600px;height:600px;"></div>
+
+<script type="text/javascript">
+
+    var int=self.setInterval("process()",2000);
+
+    function process()
+    {
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+
+        $.get('http://localhost:8080/location', function (data) {
+            console.log(data)
+            var data1 = [];
+            for (var i = 0; i < data.length; i++) {
+                var x = data[i].x;
+                var y = data[i].y;
+                var z = data[i].z;
+                data1.push([x, y, z]);
+            }
+            console.log(data1)
+            myChart.setOption({
+                grid3D: {},
+                xAxis3D: {},
+                yAxis3D: {},
+                // zAxis3D: { max: 200 },
+                zAxis3D: {},
+                series: [{
+                    type: 'scatter3D',
+                    data: data1
+                }]
+            })
+        }, 'json')
+    }
+
+</script>
+</body>
